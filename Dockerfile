@@ -12,4 +12,4 @@ COPY . /app
 
 RUN python run.py install
 
-CMD ["python", "run.py"]
+CMD ["sh", "-c", "python run.py && uvicorn api_on_top:scrapping_api --host 0.0.0.0 --port 8765"]

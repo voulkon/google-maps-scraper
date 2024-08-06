@@ -3,3 +3,7 @@ botasaurus-server
 dateutils
 lxml
 regex
+fastapi
+pydantic
+uvicorn
+pymongo
