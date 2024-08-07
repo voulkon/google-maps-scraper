@@ -55,6 +55,9 @@ def upload_results(the_mongo_db, a_task_complete, user_requested_it:str):
         the_mongo_db['place_related'].insert_one(place)
         for detailed_review in detailed_reviews:
             detailed_review['user_requested_it'] = user_requested_it
+            detailed_review["place_id"] = place["place_id"]
+            # HACK: Maybe redundant but for now it's convenient
+            detailed_review["place_name"] = place["name"]
             the_mongo_db['reviews'].insert_one(detailed_review)
 
 @scrapping_api.get("/")
