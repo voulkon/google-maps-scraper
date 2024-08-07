@@ -63,7 +63,7 @@ def say_hi():
 
 @scrapping_api.post("/send_a_task")
 def post_a_task(
-    query: str
+    query: str,
     user_requested_it:str
 ):
     data_to_be = {
