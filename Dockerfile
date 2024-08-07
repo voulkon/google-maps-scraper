@@ -10,8 +10,12 @@ RUN mkdir app
 WORKDIR /app
 COPY . /app
 
-EXPOSE 8765
-
 RUN python run.py install
 
-CMD ["sh", "-c", "python run.py && uvicorn api_on_top:scrapping_api --host 0.0.0.0 --port 8765"]
+EXPOSE 3000 8000 8765
+
+RUN apt-get update && apt-get install -y supervisor
+
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
