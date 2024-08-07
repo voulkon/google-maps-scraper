@@ -40,15 +40,21 @@ def is_task_finished(task_ids: List[int]):
             sleep(2)
     return True
 
-def upload_results(the_mongo_db, a_task_complete):
+def upload_results(the_mongo_db, a_task_complete, user_requested_it:str):
     key_of_all_stuff = 'result'
     task_info = a_task_complete.pop(key_of_all_stuff)
+    
+    a_task_complete['user_requested_it'] = user_requested_it
+    
     the_mongo_db['result_related_stuff'].insert_one(a_task_complete)
     for place in task_info:
         featured_reviews = place.pop('featured_reviews')
         detailed_reviews = place.pop('detailed_reviews')
+        
+        place['user_requested_it'] = user_requested_it
         the_mongo_db['place_related'].insert_one(place)
         for detailed_review in detailed_reviews:
+            detailed_review['user_requested_it'] = user_requested_it
             the_mongo_db['reviews'].insert_one(detailed_review)
 
 @scrapping_api.get("/")
@@ -56,7 +62,10 @@ def say_hi():
     return {'hi': 'there'}
 
 @scrapping_api.post("/send_a_task")
-def post_a_task(query: str):
+def post_a_task(
+    query: str
+    user_requested_it:str
+):
     data_to_be = {
         'queries': [query],
         'country': None,
@@ -77,7 +86,7 @@ def post_a_task(query: str):
         this_tasks_ids: List[int] = [task['id'] for task in a_task if task['task_name'] == 'All Task']
         if is_task_finished(this_tasks_ids):
             result_of_scraping = api.get_task(this_tasks_ids[0])
-            upload_results(the_mongo_db, a_task_complete=result_of_scraping)
+            upload_results(the_mongo_db, a_task_complete=result_of_scraping, user_requested_it = user_requested_it)
         return {"task_id": this_tasks_ids[0], "status": "Task uploaded successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
